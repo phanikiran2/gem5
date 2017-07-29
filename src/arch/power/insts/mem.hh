@@ -86,6 +86,47 @@ class MemDispOp : public MemOp
     std::string generateDisassembly(Addr pc, const SymbolTable *symtab) const;
 };
 
+
+/**
+ * Class for memory operations with shifted displacement.
+ */
+class MemDispShiftOp : public MemOp
+{
+  protected:
+
+    int16_t disp;
+
+    /// Constructor
+    MemDispShiftOp(const char *mnem, MachInst _machInst, OpClass __opClass,
+                   StaticInstPtr _eaCompPtr = nullStaticInstPtr,
+                   StaticInstPtr _memAccPtr = nullStaticInstPtr)
+      : MemOp(mnem, _machInst, __opClass, _eaCompPtr, _memAccPtr),
+        disp(sext<14>(machInst.ds))
+    {
+    }
+
+    std::string generateDisassembly(Addr pc, const SymbolTable *symtab) const;
+};
+
+
+/**
+ * Class for memory operations with register indexed addressing.
+ */
+class MemIndexOp : public MemOp
+{
+  protected:
+
+    /// Constructor
+    MemIndexOp(const char *mnem, MachInst _machInst, OpClass __opClass,
+               StaticInstPtr _eaCompPtr = nullStaticInstPtr,
+               StaticInstPtr _memAccPtr = nullStaticInstPtr)
+      : MemOp(mnem, _machInst, __opClass, _eaCompPtr, _memAccPtr)
+    {
+    }
+
+    std::string generateDisassembly(Addr pc, const SymbolTable *symtab) const;
+};
+
 } // namespace PowerISA
 
 #endif //__ARCH_POWER_INSTS_MEM_HH__
