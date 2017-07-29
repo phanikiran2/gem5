@@ -384,6 +384,27 @@ decode PO default Unknown::unknown() {
 
             506: popcntd({{ Ra = popCount(Rs); }});
 
+            154: prtyw({{
+                // The code below is based on the algorithm used to implement
+                // the "prtyw" instruction for Power emulation in Qemu.
+                uint64_t res = Rs;
+                res = res ^ (res >> 16);
+                res = res ^ (res >> 8);
+                res = res & 0x100000001;
+                Ra = res;
+            }});
+
+            186: prtyd({{
+                // The code below is based on the algorithm used to implement
+                // the "prtyd" instruction for Power emulation in Qemu.
+                uint64_t res = Rs;
+                res = res ^ (res >> 32);
+                res = res ^ (res >> 16);
+                res = res ^ (res >> 8);
+                res = res & 0x1;
+                Ra = res;
+            }});
+
             24: slw({{
                 if (Rb & 0x20) {
                     Ra = 0;
