@@ -57,7 +57,11 @@ unameFunc(SyscallDesc *desc, int callnum, Process *process,
 
     strcpy(name->sysname, "Linux");
     strcpy(name->nodename, "sim.gem5.org");
-    strcpy(name->release, "3.0.0");
+    // Setting release to 4.0.0 since programs compiled linked to a
+    // modern libc expect release value > 3.0.ff (as per the code
+    // in generic_start_main() which in the binary we compiled expects
+    // the value to be greater than 3.0.ff.
+    strcpy(name->release, "4.0.0");
     strcpy(name->version, "#1 Mon Aug 18 11:32:15 EDT 2003");
     strcpy(name->machine, "power");
 
@@ -99,7 +103,7 @@ SyscallDesc PowerLinuxProcess::syscallDescs[] = {
     /* 30 */ SyscallDesc("utime", unimplementedFunc),
     /* 31 */ SyscallDesc("stty", unimplementedFunc),
     /* 32 */ SyscallDesc("gtty", unimplementedFunc),
-    /* 33 */ SyscallDesc("access", unimplementedFunc),
+    /* 33 */ SyscallDesc("access", accessFunc),
     /* 34 */ SyscallDesc("nice", unimplementedFunc),
     /* 35 */ SyscallDesc("ftime", unimplementedFunc),
     /* 36 */ SyscallDesc("sync", unimplementedFunc),
@@ -151,7 +155,7 @@ SyscallDesc PowerLinuxProcess::syscallDescs[] = {
     /* 82 */ SyscallDesc("reserved#82", unimplementedFunc),
     /* 83 */ SyscallDesc("symlink", unimplementedFunc),
     /* 84 */ SyscallDesc("unused#84", unimplementedFunc),
-    /* 85 */ SyscallDesc("readlink", unimplementedFunc),
+    /* 85 */ SyscallDesc("readlink", readlinkFunc),
     /* 86 */ SyscallDesc("uselib", unimplementedFunc),
     /* 87 */ SyscallDesc("swapon", gethostnameFunc),
     /* 88 */ SyscallDesc("reboot", unimplementedFunc),

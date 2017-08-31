@@ -313,6 +313,8 @@ decode PO default Unknown::unknown() {
                 0x20: mfxer({{ Rt = XER; }});
                 0x100: mflr({{ Rt = LR; }});
                 0x120: mfctr({{ Rt = CTR; }});
+                // This is the PVR corresponding to POWER8.
+                0x3E8: mfpvr({{ Rt = 0x004a0201; }});
             }
             467: decode SPR {
                 0x20: mtxer({{ XER = Rs; }});

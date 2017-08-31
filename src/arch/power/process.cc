@@ -138,6 +138,16 @@ PowerProcess::argsInit(int intSize, int pageSize)
         auxv.push_back(auxv_t(M5_AT_EXECFN, 0));
         //The string "v51" with unknown meaning
         auxv.push_back(auxv_t(M5_AT_PLATFORM, 0));
+        //The address of 16 "random" bytes.
+        // Setting this to the beginning of .data section
+        // This is a hack!!!!
+        // Start of the data section (data_start) obtained from
+        // objdump -dsrx ./hello | grep "data_start" | awk '{print $1}'
+        // The value is 0x100b0000
+        // A correct way to fix this would be to set this value to
+        // some random location within the data section in the ELF object.
+        // To learn more about AT_RANDOM read: https://lwn.net/Articles/519085/
+        auxv.push_back(auxv_t(M5_AT_RANDOM, 269156352));
     }
 
     //Figure out how big the initial stack nedes to be
