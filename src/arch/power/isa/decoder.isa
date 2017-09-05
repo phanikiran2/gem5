@@ -168,6 +168,7 @@ decode PO default Unknown::unknown() {
             20: lwarx({{ Rt = Mem_sw; Rsv = 1; RsvLen = 4; RsvAddr = EA; }});
             534: lwbrx({{ Rt = swap_byte(Mem_uw); }});
             21: ldx({{ Rt = Mem; }});
+	    84: ldarx({{ Rt = Mem_sd; Rsv = 1; RsvLen = 8; RsvAddr = EA; }});
             532: ldbrx({{ Rt = swap_byte(Mem); }});
             535: lfsx({{ Ft_sf = Mem_sf; }});
             599: lfdx({{ Ft = Mem_df; }});
@@ -208,6 +209,22 @@ decode PO default Unknown::unknown() {
             }});
             662: stwbrx({{ Mem_uw = swap_byte(Rs_uw); }});
             149: stdx({{ Mem = Rs }});
+	    214: stdcx({{
+                bool store_performed = false;
+                Mem_uw = Rs_uw;
+                if (Rsv) {
+                    if (RsvLen == 8) {
+                        if (RsvAddr == EA) {
+                            store_performed = true;
+                        }
+                    }
+                }
+                Xer xer = XER;
+                Cr cr = CR;
+                cr.cr0 = ((store_performed ? 0x2 : 0x0) | xer.so);
+                CR = cr;
+                Rsv = 0;
+            }});
             660: stdbrx({{ Mem = swap_byte(Rs); }});
             663: stfsx({{ Mem_sf = Fs_sf; }});
             727: stfdx({{ Mem_df = Fs; }});
@@ -314,6 +331,7 @@ decode PO default Unknown::unknown() {
                 0x100: mflr({{ Rt = LR; }});
                 0x120: mfctr({{ Rt = CTR; }});
                 // This is the PVR corresponding to POWER8.
+		0x188: mftb({{ Rt = 0; }});
                 0x3E8: mfpvr({{ Rt = 0x004a0201; }});
             }
             467: decode SPR {

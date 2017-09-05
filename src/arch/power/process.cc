@@ -81,7 +81,7 @@ PowerProcess::initState()
 void
 PowerProcess::argsInit(int intSize, int pageSize)
 {
-    typedef AuxVector<uint32_t> auxv_t;
+    typedef AuxVector<uint64_t> auxv_t;
     std::vector<auxv_t> auxv;
 
     string filename;
@@ -103,11 +103,11 @@ PowerProcess::argsInit(int intSize, int pageSize)
     //Auxilliary vectors are loaded only for elf formatted executables.
     ElfObject * elfObject = dynamic_cast<ElfObject *>(objFile);
     if (elfObject) {
-        uint32_t features = 0;
-
+        uint64_t features = 0;
+       
         //Bits which describe the system hardware capabilities
-        //XXX Figure out what these should be
-        auxv.push_back(auxv_t(M5_AT_HWCAP, features));
+        //XXX Figure out what these should be     
+	auxv.push_back(auxv_t(M5_AT_HWCAP, features));
         //The system page size
         auxv.push_back(auxv_t(M5_AT_PAGESZ, PowerISA::PageBytes));
         //Frequency at which times() increments
@@ -147,46 +147,46 @@ PowerProcess::argsInit(int intSize, int pageSize)
         // A correct way to fix this would be to set this value to
         // some random location within the data section in the ELF object.
         // To learn more about AT_RANDOM read: https://lwn.net/Articles/519085/
-        auxv.push_back(auxv_t(M5_AT_RANDOM, 269156352));
+        auxv.push_back(auxv_t(M5_AT_RANDOM, objFile->dataBase()));
     }
 
     //Figure out how big the initial stack nedes to be
 
     // A sentry NULL void pointer at the top of the stack.
-    int sentry_size = intSize;
+    uint64_t sentry_size = intSize;
 
     string platform = "v51";
-    int platform_size = platform.size() + 1;
+    uint64_t platform_size = platform.size() + 1;
 
     // The aux vectors are put on the stack in two groups. The first group are
     // the vectors that are generated as the elf is loaded. The second group
     // are the ones that were computed ahead of time and include the platform
     // string.
-    int aux_data_size = filename.size() + 1;
+    uint64_t aux_data_size = filename.size() + 1;
 
-    int env_data_size = 0;
+    uint64_t env_data_size = 0;
     for (int i = 0; i < envp.size(); ++i) {
         env_data_size += envp[i].size() + 1;
     }
-    int arg_data_size = 0;
+    uint64_t arg_data_size = 0;
     for (int i = 0; i < argv.size(); ++i) {
         arg_data_size += argv[i].size() + 1;
     }
 
-    int info_block_size =
+    uint64_t info_block_size =
         sentry_size + env_data_size + arg_data_size +
         aux_data_size + platform_size;
 
-    //Each auxilliary vector is two 4 byte words
-    int aux_array_size = intSize * 2 * (auxv.size() + 1);
+    //Each auxilliary vector is two 8 byte words
+    uint64_t aux_array_size = intSize * 2 * (auxv.size() + 1);
 
-    int envp_array_size = intSize * (envp.size() + 1);
-    int argv_array_size = intSize * (argv.size() + 1);
+    uint64_t envp_array_size = intSize * (envp.size() + 1);
+    uint64_t argv_array_size = intSize * (argv.size() + 1);
 
-    int argc_size = intSize;
+    uint64_t argc_size = intSize;
 
     //Figure out the size of the contents of the actual initial frame
-    int frame_size =
+    uint64_t frame_size =
         info_block_size +
         aux_array_size +
         envp_array_size +
@@ -195,11 +195,11 @@ PowerProcess::argsInit(int intSize, int pageSize)
 
     //There needs to be padding after the auxiliary vector data so that the
     //very bottom of the stack is aligned properly.
-    int partial_size = frame_size;
-    int aligned_partial_size = roundUp(partial_size, align);
-    int aux_padding = aligned_partial_size - partial_size;
+    uint64_t partial_size = frame_size;
+    uint64_t aligned_partial_size = roundUp(partial_size, align);
+    uint64_t aux_padding = aligned_partial_size - partial_size;
 
-    int space_needed = frame_size + aux_padding;
+    uint64_t space_needed = frame_size + aux_padding;
 
     Addr stack_min = memState->getStackBase() - space_needed;
     stack_min = roundDown(stack_min, align);
@@ -211,15 +211,15 @@ PowerProcess::argsInit(int intSize, int pageSize)
                 roundUp(memState->getStackSize(), pageSize));
 
     // map out initial stack contents
-    uint32_t sentry_base = memState->getStackBase() - sentry_size;
-    uint32_t aux_data_base = sentry_base - aux_data_size;
-    uint32_t env_data_base = aux_data_base - env_data_size;
-    uint32_t arg_data_base = env_data_base - arg_data_size;
-    uint32_t platform_base = arg_data_base - platform_size;
-    uint32_t auxv_array_base = platform_base - aux_array_size - aux_padding;
-    uint32_t envp_array_base = auxv_array_base - envp_array_size;
-    uint32_t argv_array_base = envp_array_base - argv_array_size;
-    uint32_t argc_base = argv_array_base - argc_size;
+    uint64_t sentry_base = memState->getStackBase() - sentry_size;
+    uint64_t aux_data_base = sentry_base - aux_data_size;
+    uint64_t env_data_base = aux_data_base - env_data_size;
+    uint64_t arg_data_base = env_data_base - arg_data_size;
+    uint64_t platform_base = arg_data_base - platform_size;
+    uint64_t auxv_array_base = platform_base - aux_array_size - aux_padding;
+    uint64_t envp_array_base = auxv_array_base - envp_array_size;
+    uint64_t argv_array_base = envp_array_base - argv_array_size;
+    uint64_t argc_base = argv_array_base - argc_size;
 
     DPRINTF(Stack, "The addresses of items on the initial stack:\n");
     DPRINTF(Stack, "0x%x - aux data\n", aux_data_base);
@@ -235,11 +235,11 @@ PowerProcess::argsInit(int intSize, int pageSize)
     // write contents to stack
 
     // figure out argc
-    uint32_t argc = argv.size();
-    uint32_t guestArgc = PowerISA::htog(argc);
+    uint64_t argc = argv.size();
+    uint64_t guestArgc = PowerISA::htog(argc);
 
     //Write out the sentry void *
-    uint32_t sentry_NULL = 0;
+    uint64_t sentry_NULL = 0;
     initVirtMem.writeBlob(sentry_base,
             (uint8_t*)&sentry_NULL, sentry_size);
 
