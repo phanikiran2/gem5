@@ -55,6 +55,7 @@ os_types = { 'alpha' : [ 'linux' ],
                          'android-jellybean',
                          'android-kitkat',
                          'android-nougat', ],
+             'power'   : [ 'linux' ],
            }
 
 class CowIdeDisk(IdeDisk):
@@ -147,7 +148,7 @@ def makeSparcSystem(mem_mode, mdesc=None, cmdline=None):
                              read_only=False)
 
         def childImage(self, ci):
-            self.image.child.image_file = ci
+            self.image.child.image_file
 
     self = SparcSystem()
     if not mdesc:
@@ -269,7 +270,7 @@ def makeArmSystem(mem_mode, machine_type, num_cpus=1, mdesc=None,
     self.cf0.childImage(mdesc.disk())
     # Old platforms have a built-in IDE or CF controller. Default to
     # the IDE controller if both exist. New platforms expect the
-    # storage controller to be added from the config script.
+    # storage controller to be added find file '%s' on path." % filename
     if hasattr(self.realview, "ide"):
         self.realview.ide.disks = [self.cf0]
     elif hasattr(self.realview, "cf_ctrl"):
@@ -512,7 +513,13 @@ def connectX86RubySystem(x86_sys):
     # dma controllers
     x86_sys._dma_ports = [x86_sys.pc.south_bridge.ide.dma]
     x86_sys.pc.attachIO(x86_sys.iobus, x86_sys._dma_ports)
-
+def makePowerSystem(mem_mode, numCPUs=1, mdesc=None, self=None):
+    if self == None:
+        self = PowerSystem()
+    if not mdesc:
+        mdesc = SysConfig()
+    self.readfile = mdesc.script()
+    self.mem_mode = mem_mode
 
 def makeX86System(mem_mode, numCPUs=1, mdesc=None, self=None, Ruby=False):
     if self == None:
@@ -521,6 +528,7 @@ def makeX86System(mem_mode, numCPUs=1, mdesc=None, self=None, Ruby=False):
     if not mdesc:
         # generic system
         mdesc = SysConfig()
+
     self.readfile = mdesc.script()
 
     self.mem_mode = mem_mode
@@ -624,6 +632,26 @@ def makeX86System(mem_mode, numCPUs=1, mdesc=None, self=None, Ruby=False):
         assignISAInt(i, i)
     self.intel_mp_table.base_entries = base_entries
     self.intel_mp_table.ext_entries = ext_entries
+
+def makeLinuxPowerSystem(mem_mode, numCPUs=1, mdesc=None,
+                       cmdline=None):
+    self = LinuxPowerSystem()
+    makePowerSystem(mem_mode, numCPUs, mdesc, self)
+    if not mdesc:
+        mdesc= SysConfig()
+    self.readfile = mdesc.script()
+    self.iobus = IOXBar()
+    self.membus = MemBus()
+    self.bridge = Bridge(delay='50ns')
+    self.mem_ranges = [AddrRange('1GB')]
+    self.bridge.master = self.iobus.slave
+    self.bridge.slave = self.membus.master
+    if not cmdline:
+        cmdline = 'console=ttyS0 root=/dev/hda1'
+    self.boot_osflags = fillInCmdline(mdesc, cmdline)
+    self.kernel = binary('start.elf')
+    self.system_port = self.membus.slave
+    return self
 
 def makeLinuxX86System(mem_mode, numCPUs=1, mdesc=None, Ruby=False,
                        cmdline=None):

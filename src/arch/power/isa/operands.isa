@@ -68,10 +68,25 @@ def operands {{
     'LR': ('IntReg', 'ud', 'INTREG_LR', 'IsInteger', 9),
     'CTR': ('IntReg', 'ud', 'INTREG_CTR', 'IsInteger', 9),
     'XER': ('IntReg', 'uw', 'INTREG_XER', 'IsInteger', 9),
+    'DSCR': ('IntReg', 'ud', 'INTREG_DSCR', 'IsInteger', 9),
+    'DSISR': ('IntReg', 'uw', 'INTREG_DSISR', 'IsInteger', 9),
+    'DAR': ('IntReg', 'ud', 'INTREG_DAR', 'IsInteger', 9),
+    'DEC': ('IntReg', 'ud', 'INTREG_DEC', 'IsInteger', 9),
+    'SRR0': ('IntReg', 'ud', 'INTREG_SRR0', 'IsInteger', 9),
+    'SRR1': ('IntReg', 'ud', 'INTREG_SRR1', 'IsInteger', 9),
+    'CFAR': ('IntReg', 'ud', 'INTREG_CFAR', 'IsInteger', 9),
+    'CTRL': ('IntReg', 'uw', 'INTREG_CTRL', 'IsInteger', 9),
+    'VRSAVE': ('IntReg', 'uw', 'INTREG_VRSAVE', 'IsInteger', 9),
+    'TB': ('IntReg', 'ud', 'INTREG_TB', 'IsInteger', 9),
+    'TBU': ('IntReg', 'uw', 'INTREG_TBU', 'IsInteger', 9),
+    'TBL': ('IntReg', 'uw', 'INTREG_TBL', 'IsInteger', 9),
+    'PVR': ('IntReg', 'uw', 'INTREG_PVR', 'IsInteger', 9),
+    'PPR': ('IntReg', 'ud', 'INTREG_PPR', 'IsInteger', 9),
+    'PPR32': ('IntReg', 'uw', 'INTREG_PPR32', 'IsInteger', 9),
 
     # Setting as IntReg so things are stored as an integer, not double
     'FPSCR': ('IntReg', 'uw', 'INTREG_FPSCR', 'IsFloating', 9),
-
+    'MSR': ('IntReg', 'ud', 'INTREG_MSR', 'IsFloating', 9),
     # Registers for linked loads and stores
     'Rsv': ('IntReg', 'uw', 'INTREG_RSV', 'IsInteger', 9),
     'RsvLen': ('IntReg', 'uw', 'INTREG_RSV_LEN', 'IsInteger', 9),

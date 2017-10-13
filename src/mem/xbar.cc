@@ -408,7 +408,7 @@ BaseXBar::recvRangeChange(PortID master_port_id)
                 if (p->second == master_port_id)
                     // erasing invalidates the iterator, so advance it
                     // before the deletion takes place
-                    portMap.erase(p++);
+                       portMap.erase(p++);
                 else
                     p++;
             }
@@ -419,7 +419,7 @@ BaseXBar::recvRangeChange(PortID master_port_id)
         for (const auto& r: ranges) {
             DPRINTF(AddrRanges, "Adding range %s for id %d\n",
                     r.to_string(), master_port_id);
-            if (portMap.insert(r, master_port_id) == portMap.end()) {
+           if (portMap.insert(r, master_port_id) == portMap.end()) {
                 PortID conflict_id = portMap.find(r)->second;
                 fatal("%s has two ports responding within range %s:\n\t%s\n\t%s\n",
                       name(),

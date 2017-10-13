@@ -87,6 +87,7 @@ BitUnion32(ExtMachInst)
 
     // FXM field for mtcrf instruction
     Bitfield<19, 12> fxm;
+    Bitfield<20, 11> bhrb;
 EndBitUnion(ExtMachInst)
 
 typedef GenericISA::SimplePCState<MachInst> PCState;
