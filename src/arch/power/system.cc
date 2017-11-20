@@ -38,8 +38,13 @@
  */
 
 #include "arch/power/system.hh"
-
+#include "arch/power/isa_traits.hh"
+#include "arch/power/registers.hh"
+#include "base/loader/object_file.hh"
+#include "cpu/thread_context.hh"
 #include "params/PowerSystem.hh"
+
+using namespace PowerISA;
 
 PowerSystem::PowerSystem(Params *p) :
     System(p)
@@ -54,4 +59,12 @@ PowerSystem *
 PowerSystemParams::create()
 {
     return new PowerSystem(this);
+}
+
+void
+PowerSystem::initState()
+{
+    System::initState();
+    ThreadContext *tc = threadContexts[0];
+    tc->pcState(tc->getSystemPtr()->kernelEntry);
 }

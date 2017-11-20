@@ -58,13 +58,17 @@ def system():
             path = env['M5_PATH'].split(':')
         except KeyError:
             path = [ '/dist/m5/system',
-                     '/home/venkatnarayan/full_system_images/x86-system/' ]
+                   '/home/student/Desktop/full_system_images/x86-system' ]
+
         # expand '~' and '~user' in paths
         path = map(os.path.expanduser, path)
+
         # filter out non-existent directories
         system.path = filter(os.path.isdir, path)
+
         if not system.path:
             raise IOError, "Can't find a path to system files."
+
     if not binary.path:
         binary.path = [joinpath(p, 'binaries') for p in system.path]
     if not disk.path:

@@ -106,7 +106,7 @@ def build_test_system(np):
             test_sys.enable_context_switch_stats_dump = True
     elif buildEnv['TARGET_ISA'] == "power":
         test_sys = makeLinuxPowerSystem(test_mem_mode, options.num_cpus, bm[0],
-                cmdline=cmdline)
+                                        cmdline=cmdline)
     else:
         fatal("Incapable of building %s full system!", buildEnv['TARGET_ISA'])
 
@@ -127,7 +127,6 @@ def build_test_system(np):
     test_sys.cpu_clk_domain = SrcClockDomain(clock = options.cpu_clock,
                                              voltage_domain =
                                              test_sys.cpu_voltage_domain)
-
     if options.kernel is not None:
         test_sys.kernel = binary(options.kernel)
 
@@ -141,7 +140,6 @@ def build_test_system(np):
         test_sys.have_virtualization = True
 
     test_sys.init_param = options.init_param
-
     # For now, assign all the CPUs to the same clock domain
     test_sys.cpu = [TestCPUClass(clk_domain=test_sys.cpu_clk_domain, cpu_id=i)
                     for i in xrange(np)]
@@ -155,7 +153,6 @@ def build_test_system(np):
                 options.cpu_type == "TimingSimpleCPU"):
             print >> sys.stderr, "Ruby requires TimingSimpleCPU or O3CPU!!"
             sys.exit(1)
-
         Ruby.create_system(options, True, test_sys, test_sys.iobus,
                            test_sys._dma_ports)
 
@@ -165,7 +162,7 @@ def build_test_system(np):
 
         # Connect the ruby io port to the PIO bus,
         # assuming that there is just one such port.
-        test_sys.iobus.master = test_sys.ruby._io_port.slave
+        #test_sys.iobus.master = test_sys.ruby._io_port.slave
 
         for (i, cpu) in enumerate(test_sys.cpu):
             #
@@ -189,14 +186,8 @@ def build_test_system(np):
 
     else:
         if options.caches or options.l2cache:
-            # By default the IOCache runs at the system clock
             test_sys.iocache = IOCache(addr_ranges = test_sys.mem_ranges)
-            test_sys.iocache.cpu_side = test_sys.iobus.master
             test_sys.iocache.mem_side = test_sys.membus.slave
-        elif not options.external_memory_system:
-            test_sys.iobridge = Bridge(delay='50ns', ranges = test_sys.mem_ranges)
-            test_sys.iobridge.slave = test_sys.iobus.master
-            test_sys.iobridge.master = test_sys.membus.slave
 
         # Sanity check
         if options.fastmem:
@@ -235,7 +226,6 @@ def build_test_system(np):
         CacheConfig.config_cache(options, test_sys)
 
         MemConfig.config_mem(options, test_sys)
-
     return test_sys
 
 def build_drive_system(np):
@@ -258,9 +248,10 @@ def build_drive_system(np):
     elif buildEnv['TARGET_ISA'] == 'arm':
         drive_sys = makeArmSystem(drive_mem_mode, options.machine_type, np,
                                   bm[1], options.dtb_filename, cmdline=cmdline)
+    #x86 implementation
     elif buildEnv['TARGET_ISA'] == 'power':
         drive_sys = makeLinuxPowerSystem(drive_mem_mode, np, bm[1],
-                                       cmdline=cmdline)
+                                         cmdline=cmdline)
 
     # Create a top-level voltage domain
     drive_sys.voltage_domain = VoltageDomain(voltage = options.sys_voltage)

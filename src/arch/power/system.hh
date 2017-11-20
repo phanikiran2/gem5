@@ -49,10 +49,10 @@
 class PowerSystem : public System
 {
   public:
+    void initState();
     typedef PowerSystemParams Params;
     PowerSystem(Params *p);
     ~PowerSystem();
 };
-
 #endif
 

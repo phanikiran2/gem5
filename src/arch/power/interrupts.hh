@@ -84,7 +84,8 @@ class Interrupts : public SimObject
     bool
     checkInterrupts(ThreadContext *tc) const
     {
-        panic("Interrupts::checkInterrupts not implemented.\n");
+        //panic("Interrupts::checkInterrupts not implemented.\n");
+        return false;
     }
 
     Fault
