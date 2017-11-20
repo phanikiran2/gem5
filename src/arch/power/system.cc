@@ -39,6 +39,7 @@
 
 #include "arch/power/system.hh"
 #include "arch/power/isa_traits.hh"
+#include "arch/power/miscregs.hh"
 #include "arch/power/registers.hh"
 #include "base/loader/object_file.hh"
 #include "cpu/thread_context.hh"
@@ -67,4 +68,8 @@ PowerSystem::initState()
     System::initState();
     ThreadContext *tc = threadContexts[0];
     tc->pcState(tc->getSystemPtr()->kernelEntry);
+    Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
+    msr.ir = 0;
+    msr.dr = 0;
+    tc->setMiscRegNoEffect(MISCREG_MSR , msr);
 }

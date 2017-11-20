@@ -132,7 +132,6 @@ decode PO default Unknown::unknown() {
         }
         format MiscOp {
             150: isync({{ }}, [ IsSerializeAfter ]);
-
             default: decode DX_XO {
                 format IntDispArithOp {
                     2: addpcis({{ Rt = NIA + (disp << 16); }});
@@ -168,7 +167,7 @@ decode PO default Unknown::unknown() {
             20: lwarx({{ Rt = Mem_sw; Rsv = 1; RsvLen = 4; RsvAddr = EA; }});
             534: lwbrx({{ Rt = swap_byte(Mem_uw); }});
             21: ldx({{ Rt = Mem; }});
-	    84: ldarx({{ Rt = Mem_sd; Rsv = 1; RsvLen = 8; RsvAddr = EA; }});
+            84: ldarx({{ Rt = Mem_sd; Rsv = 1; RsvLen = 8; RsvAddr = EA; }});
             532: ldbrx({{ Rt = swap_byte(Mem); }});
             535: lfsx({{ Ft_sf = Mem_sf; }});
             599: lfdx({{ Ft = Mem_df; }});
@@ -209,7 +208,7 @@ decode PO default Unknown::unknown() {
             }});
             662: stwbrx({{ Mem_uw = swap_byte(Rs_uw); }});
             149: stdx({{ Mem = Rs }});
-	    214: stdcx({{
+            214: stdcx({{
                 bool store_performed = false;
                 Mem_uw = Rs_uw;
                 if (Rsv) {
@@ -330,39 +329,42 @@ decode PO default Unknown::unknown() {
                 0x20: mfxer({{ Rt = XER; }});
                 0x100: mflr({{ Rt = LR; }});
                 0x120: mfctr({{ Rt = CTR; }});
+                // This is the PVR corresponding to POWER8.
+                // Probably comes from RTC
+                // Maybe set it to time(NULL) ?
                 0x188: mftb({{ Rt = TB; }});
-                0x1A8: mftbu({{ Rt = TBU; }});
                 0x220: mfdscr({{ Rt = DSCR; }});
                 0x240: mfdsisr({{ Rt = DSISR; }});
                 0x260: mfdar({{ Rt = DAR; }});
                 0x2C0: mfdec({{ Rt = DEC; }});
                 0x340: mfsrr0({{ Rt = SRR0; }});
                 0x360: mfsrr1({{ Rt = SRR1; }});
-                0x380: mfxcfar({{ Rt = CFAR; }});
+                0x380: mfcfar({{ Rt = CFAR; }});
                 0x104: mfctrl({{ Rt = CTRL; }});
-                0x08: mfvrsave({{ Rt = VRSAVE; }});
+                0x008:  mfvrsave({{ Rt = VRSAVE; }});
+                0x1A8: mftbu({{ Rt = TBU; }});
                 0x3E8: mfpvr({{ Rt = PVR; }});
-                0x1C: mfppr({{ Rt = PPR; }});
-                0x5C: mfppr32({{ Rt = PPR32; }});
+                0x01C: mfppr({{ Rt = PPR; }});
+                0x05C: mfppr2({{ Rt =PPR32; }});
             }
             467: decode SPR {
                 0x20: mtxer({{ XER = Rs; }});
                 0x100: mtlr({{ LR = Rs; }});
                 0x120: mtctr({{ CTR = Rs; }});
                 0x390: mttbl({{ TBL = Rs; }});
-                0x1A8: mttbu({{ TBU = Rs; }});
                 0x220: mtdscr({{ DSCR = Rs; }});
                 0x240: mtdsisr({{ DSISR = Rs; }});
                 0x260: mtdar({{ DAR = Rs; }});
                 0x2C0: mtdec({{ DEC = Rs; }});
                 0x340: mtsrr0({{ SRR0 = Rs; }});
                 0x360: mtsrr1({{ SRR1 = Rs; }});
-                0x380: mtxcfar({{ CFAR = Rs; }});
+                0x380: mtcfar({{ CFAR = Rs; }});
                 0x304: mtctrl({{ CTRL = Rs; }});
-                0x08: mtvrsave({{ VRSAVE = Rs; }});
+                0x008: mtvrsave({{ VRSAVE = Rs; }});
+                0x1A8: mttbu({{ TBU = Rs; }});
                 0x3E8: mtpvr({{ PVR = Rs; }});
-                0x1C: mtppr({{ PPR = Rs; }});
-                0x5C: mtppr32({{ PPR32 = Rs; }});
+                0x01C: mtppr({{ PPR = Rs; }});
+                0x05C: mtppr32({{ PPR32 = Rs; }});
             }
         }
 
@@ -809,6 +811,7 @@ decode PO default Unknown::unknown() {
                             CR = (Rs & mask) | (CR & ~mask);
                         }});
                         19: mfcr({{ Rt = CR; }});
+
                     }
                 }
             }

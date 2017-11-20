@@ -57,13 +57,13 @@ class SysConfig:
         elif buildEnv['TARGET_ISA'] == 'alpha':
             return env.get('LINUX_IMAGE', disk('linux-latest.img'))
         elif buildEnv['TARGET_ISA'] == 'x86':
-            return env.get('LINUX_IMAGE', disk('linux-x86.img'))
+            return env.get('LINUX_IMAGE', disk('x86root.img'))
         elif buildEnv['TARGET_ISA'] == 'arm':
             return env.get('LINUX_IMAGE', disk('linux-aarch32-ael.img'))
         elif buildEnv['TARGET_ISA'] == 'sparc':
             return env.get('LINUX_IMAGE', disk('disk.s10hw2'))
         elif buildEnv['TARGET_ISA'] == 'power':
-            return env.get('LINUX_IMAGE', disk('linux-latest.img'))
+            return env.get('LINUX_IMAGE', disk('linux-x86.img'))
         else:
             print "Don't know what default disk image to use for %s ISA" % \
                 buildEnv['TARGET_ISA']

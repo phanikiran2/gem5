@@ -37,11 +37,21 @@ namespace PowerISA
 {
 
 enum MiscRegIndex {
-    NUM_MISCREGS = 0
+    MISCREG_CR,
+    MISCREG_XER,
+    MISCREG_FPSR,
+    MISCREG_MSR,
+    NUM_MISCREGS
 };
 
 const char * const miscRegName[NUM_MISCREGS] = {
 };
+
+static inline bool
+isValidMiscReg(int index)
+{
+    return (index >= MISCREG_CR && index < NUM_MISCREGS);
+}
 
 BitUnion32(Cr)
     SubBitUnion(cr0, 31, 28)

@@ -68,7 +68,7 @@ const int NumIntArchRegs = 32;
 
 // CR, XER, LR, CTR, FPSCR, RSV, RSV-LEN, RSV-ADDR
 // and zero register, which doesn't actually exist but needs a number
-const int NumIntSpecialRegs = 9;
+const int NumIntSpecialRegs = 25;
 const int NumFloatArchRegs = 32;
 const int NumFloatSpecialRegs = 0;
 const int NumInternalProcRegs = 0;
@@ -87,6 +87,14 @@ const int ArgumentReg3 = 6;
 const int ArgumentReg4 = 7;
 const int FramePointerReg = 31;
 const int StackPointerReg = 1;
+
+/*const int ArgcReg = 3;
+const int ArgvPointerReg = 4;
+const int EnvPointerReg = 5;
+const int AuxvPointerReg = 6;
+const int TermFunctionPointerReg = 7;
+const int GlobalEntryPointAddrReg = 12;*/
+
 
 // There isn't one in Power, but we need to define one somewhere
 const int ZeroReg = NumIntRegs - 1;
@@ -120,8 +128,8 @@ enum MiscIntRegNums {
     INTREG_CTRL,
     INTREG_VRSAVE,
     INTREG_TB,
-    INTREG_TBU,
     INTREG_TBL,
+    INTREG_TBU,
     INTREG_PVR,
     INTREG_PPR,
     INTREG_PPR32,

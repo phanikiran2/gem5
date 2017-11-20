@@ -41,7 +41,9 @@
 #include <vector>
 
 #include "arch/power/faults.hh"
+#include "arch/power/miscregs.hh"
 #include "arch/power/pagetable.hh"
+#include "arch/power/registers.hh"
 #include "arch/power/utility.hh"
 #include "base/inifile.hh"
 #include "base/str.hh"
@@ -54,8 +56,8 @@
 #include "sim/full_system.hh"
 #include "sim/process.hh"
 
-using namespace std;
 using namespace PowerISA;
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -289,7 +291,6 @@ TLB::translateInst(RequestPtr req, ThreadContext *tc)
     }
 
      Process * p = tc->getProcessPtr();
-
      Fault fault = p->pTable->translate(req);
     if (fault != NoFault)
         return fault;
@@ -312,13 +313,41 @@ TLB::translateData(RequestPtr req, ThreadContext *tc, bool write)
 Fault
 TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
 {
-    if (FullSystem)
-        fatal("translate atomic not yet implemented in full system mode.\n");
+    if (FullSystem){
+        Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
+        if (mode == Execute){
+            if (msr.ir)
+                fatal("Translate Atomic not Implemented for POWER");
+            else{
+                Addr vaddr = req->getVaddr();
+                DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
+                Addr paddr = vaddr;
+                DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
+                req->setPaddr(paddr);
+                return NoFault;
+            }
+        }
+        else{
+            if (msr.dr)
+                fatal("Translate Atomic not Implemented for POWER");
+            else{
+                Addr vaddr = req->getVaddr();
+                DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
+                Addr paddr = vaddr;
+                DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
+                req->setPaddr(paddr);
+                return NoFault;
+            }
+        }
+    }
 
     if (mode == Execute)
         return translateInst(req, tc);
-    else
+    else{
+        std::cout<<"translateData"<<std::endl;
         return translateData(req, tc, mode == Write);
+
+     }
 }
 
 void

@@ -155,9 +155,13 @@ System::System(Params *p)
 
             // setup entry points
             kernelStart = kernel->textBase();
-            kernelEnd = kernel->bssBase() + kernel->bssSize();
+            if (kernel->bssBase() ==0 )
+                kernelEnd = kernel->textBase() + kernel->textSize()
+                            + kernel->dataSize();
+            else
+                kernelEnd = kernel->textBase() + kernel->bssBase()
+                            + kernel->bssSize();
             kernelEntry = kernel->entryPoint();
-
             // load symbols
             if (!kernel->loadGlobalSymbols(kernelSymtab))
                 fatal("could not load kernel symbols\n");
@@ -180,6 +184,7 @@ System::System(Params *p)
     numSystemsRunning++;
 
     // Set back pointers to the system in all memories
+    std::cout<<params()->memories.size()<<std::endl;
     for (int x = 0; x < params()->memories.size(); x++)
         params()->memories[x]->system(this);
 }
