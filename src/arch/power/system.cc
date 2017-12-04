@@ -38,6 +38,7 @@
  */
 
 #include "arch/power/system.hh"
+
 #include "arch/power/isa_traits.hh"
 #include "arch/power/miscregs.hh"
 #include "arch/power/registers.hh"
@@ -46,7 +47,6 @@
 #include "params/PowerSystem.hh"
 
 using namespace PowerISA;
-
 PowerSystem::PowerSystem(Params *p) :
     System(p)
 {
@@ -71,5 +71,6 @@ PowerSystem::initState()
     Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
     msr.ir = 0;
     msr.dr = 0;
-    tc->setMiscRegNoEffect(MISCREG_MSR , msr);
+    tc->setIntReg(INTREG_MSR , msr);
+    tc->setIntReg(INTREG_DEC , 0xffffffffffffffff );
 }

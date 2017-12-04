@@ -31,6 +31,7 @@
 #ifndef __ARCH_POWER_INTERRUPT_HH__
 #define __ARCH_POWER_INTERRUPT_HH__
 
+#include "arch/power/faults.hh"
 #include "base/misc.hh"
 #include "params/PowerInterrupts.hh"
 #include "sim/sim_object.hh"
@@ -44,6 +45,7 @@ class Interrupts : public SimObject
 {
   private:
     BaseCPU * cpu;
+    bool si = false;
 
   public:
     typedef PowerInterruptsParams Params;
@@ -82,23 +84,35 @@ class Interrupts : public SimObject
     }
 
     bool
-    checkInterrupts(ThreadContext *tc) const
+    checkInterrupts(ThreadContext *tc)
     {
         //panic("Interrupts::checkInterrupts not implemented.\n");
-        return false;
+        if ( tc->readIntReg(INTREG_DEC) == 0) {
+           si = true;
+           return true;
+        }
+        else {
+           tc->setIntReg(INTREG_DEC , tc->readIntReg(INTREG_DEC)-1);
+           return false;
+        }
     }
 
     Fault
     getInterrupt(ThreadContext *tc)
     {
         assert(checkInterrupts(tc));
-        panic("Interrupts::getInterrupt not implemented.\n");
+        if (si)
+        return std::make_shared<DecrementerInterrupt>();
+        else return NoFault;
+        //panic("Interrupts::getInterrupt not implemented.\n");
     }
 
     void
     updateIntrInfo(ThreadContext *tc)
     {
-        panic("Interrupts::updateIntrInfo not implemented.\n");
+        //panic("Interrupts::updateIntrInfo not implemented.\n");
+        tc->setIntReg(INTREG_DEC , 0xffffffffffffffff);
+        si = false;
     }
 };
 
