@@ -132,6 +132,26 @@ decode PO default Unknown::unknown() {
         }
         format MiscOp {
             150: isync({{ }}, [ IsSerializeAfter ]);
+            18:  rfid({{
+                uint32_t msr12=(bits(MSR,60)&bits(SRR1,12))
+                               |((bits(MSR,60)^0x01)&bits(MSR,s12));
+                MSR = insertBits(MSR,12,msr12);
+                uint32_t msr60=bits(MSR,60)&bits(SRR1,60);
+                MSR = insertBits(MSR,60,msr60);
+                if((bits(MSR,34,32)!=0x02)|(bits(SRR1,34,32)!=0x00))
+                    MSR = insertBits(MSR,34,32,bits(SRR1,34,32));
+                MSR = insertBits(MSR,15,(bits(SRR1,15)|bits(SRR1,14)));
+                MSR = insertBits(MSR,5,(bits(SRR1,5)|bits(SRR1,14)));
+                MSR = insertBits(MSR,4,(bits(SRR1,4)|bits(SRR1,14)));
+                MSR = insertBits(MSR,63,61,bits(SRR1,63,61));
+                MSR = insertBits(MSR,59,35,bits(SRR1,59,35));
+                MSR = insertBits(MSR,31,bits(SRR1,35));
+                MSR = insertBits(MSR,26,22,bits(SRR1,26,22));
+                MSR = insertBits(MSR,14,13,bits(SRR1,14,13));
+                MSR = insertBits(MSR,11,6,bits(SRR1,11,6));
+                MSR = insertBits(MSR,3,0,bits(SRR1,3,0));
+                NIA = SRR0 & -4ULL;
+            }});
             default: decode DX_XO {
                 format IntDispArithOp {
                     2: addpcis({{ Rt = NIA + (disp << 16); }});
@@ -366,6 +386,42 @@ decode PO default Unknown::unknown() {
                 0x01C: mtppr({{ PPR = Rs; }});
                 0x05C: mtppr32({{ PPR32 = Rs; }});
             }
+            83: mfmsr({{ Rt = MSR }});
+            178: mtmsrd({{
+                 if (L == 0 ){
+                     if(bits(MSR,34,32)!=0x02||bits(MSR,34,32)!=0x00){
+                         insertBits(MSR,15,bits(Rs,15)|bits(Rs,14));
+                         insertBits(MSR,5,bits(Rs,5)|bits(Rs,14));
+                         insertBits(MSR,4,bits(Rs,4)|bits(Rs,14));
+                         insertBits(MSR,63,61,bits(Rs,63,61));
+                         insertBits(MSR,59,35,bits(Rs,59,35));
+                         insertBits(MSR,31,16,bits(Rs,31,16));
+                         insertBits(MSR,14,13,bits(Rs,14,13));
+                         insertBits(MSR,11,6,bits(Rs,11,6));
+                         insertBits(MSR,3,1,bits(Rs,3,1));
+                     }
+                 }
+                 else{
+                     insertBits(MSR,15,bits(Rs,15));
+                     insertBits(MSR,1,bits(Rs,1));
+                 }
+            }});
+            146: mtmsr({{
+                 if( L ==0 ){
+                     insertBits(MSR,15,bits(Rs,15)|bits(Rs,14));
+                     insertBits(MSR,5,bits(Rs,5)|bits(Rs,14));
+                     insertBits(MSR,4,bits(Rs,4)|bits(Rs,14));
+                     insertBits(MSR,31,16,bits(Rs,31,16));
+                     insertBits(MSR,14,13,bits(Rs,14,13));
+                     insertBits(MSR,11,6,bits(Rs,11,6));
+                     insertBits(MSR,3,1,bits(Rs,3,1));
+                 }
+                 else{
+                     insertBits(MSR,15,bits(Rs,15));
+                     insertBits(MSR,1,bits(Rs,1));
+                 }
+            }});
+
         }
 
         // Integer logic instructions use source registers Rs and Rb,
