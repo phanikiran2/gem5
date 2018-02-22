@@ -83,6 +83,7 @@ def operands {{
     'PVR': ('IntReg', 'uw', 'INTREG_PVR', 'IsInteger', 9),
     'PPR': ('IntReg', 'ud', 'INTREG_PPR', 'IsInteger', 9),
     'PPR32': ('IntReg', 'uw', 'INTREG_PPR32', 'IsInteger', 9),
+    'PTCR': ('IntReg', 'ud', 'INTREG_PTCR', 'IsInteger', 9),
 
     # Setting as IntReg so things are stored as an integer, not double
     'FPSCR': ('IntReg', 'uw', 'INTREG_FPSCR', 'IsFloating', 9),

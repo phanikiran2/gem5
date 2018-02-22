@@ -41,6 +41,7 @@ enum MiscRegIndex {
     MISCREG_XER,
     MISCREG_FPSR,
     MISCREG_MSR,
+    MISCREG_PTCR,
     NUM_MISCREGS
 };
 
@@ -128,6 +129,10 @@ BitUnion64(Msr)
     Bitfield<0> le;
 EndBitUnion(Msr)
 
+BitUnion64(Ptcr)
+    Bitfield<59,12> patb;
+    Bitfield<4,0> pats;
+EndBitUnion(Ptcr)
 } // namespace PowerISA
 
 #endif // __ARCH_POWER_MISCREGS_HH__

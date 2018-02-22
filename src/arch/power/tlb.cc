@@ -43,6 +43,7 @@
 #include "arch/power/faults.hh"
 #include "arch/power/miscregs.hh"
 #include "arch/power/pagetable.hh"
+#include "arch/power/radixwalk.hh"
 #include "arch/power/registers.hh"
 #include "arch/power/utility.hh"
 #include "base/inifile.hh"
@@ -56,8 +57,10 @@
 #include "sim/full_system.hh"
 #include "sim/process.hh"
 
-using namespace PowerISA;
 using namespace std;
+using namespace PowerISA;
+
+namespace PowerISA {
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -65,6 +68,7 @@ using namespace std;
 //
 
 #define MODE2MASK(X) (1 << (X))
+
 
 TLB::TLB(const Params *p)
     : BaseTLB(p), size(p->size), nlu(0)
@@ -313,40 +317,41 @@ TLB::translateData(RequestPtr req, ThreadContext *tc, bool write)
 Fault
 TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
 {
+    Addr vaddr = req->getVaddr();
+    DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
+    Fault fault = NoFault;
+    Addr paddr;
     if (FullSystem){
         Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
         if (mode == Execute){
-            if (msr.ir)
-                fatal("Translate Atomic not Implemented for POWER");
+            if (msr.ir){
+                Fault fault = rwalk->start(tc,req, mode);
+                paddr = req->getPaddr();
+            }
             else{
-                Addr vaddr = req->getVaddr();
-                DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
-                Addr paddr = vaddr;
-                DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
+                paddr = vaddr;
                 req->setPaddr(paddr);
-                return NoFault;
             }
         }
         else{
-            if (msr.dr)
-                fatal("Translate Atomic not Implemented for POWER");
+            if (msr.dr){
+                Fault fault = rwalk->start(tc,req, mode);
+                paddr = req->getPaddr();
+            }
             else{
-                Addr vaddr = req->getVaddr();
-                DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
-                Addr paddr = vaddr;
-                DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
+                paddr = vaddr;
                 req->setPaddr(paddr);
-                return NoFault;
             }
         }
+        DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
+        return fault;
     }
 
     if (mode == Execute)
         return translateInst(req, tc);
     else{
-        std::cout<<"translateData"<<std::endl;
+        //std::cout<<"translateData"<<std::endl;
         return translateData(req, tc, mode == Write);
-
      }
 }
 
@@ -380,6 +385,8 @@ TLB::index(bool advance)
         nextnlu();
 
     return *pte;
+}
+
 }
 
 PowerISA::TLB *

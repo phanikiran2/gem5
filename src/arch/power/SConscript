@@ -48,6 +48,7 @@ if env['TARGET_ISA'] == 'power':
     Source('isa.cc')
     Source('pagetable.cc')
     Source('process.cc')
+    Source('radixwalk.cc')
     Source('system.cc')
     Source('remote_gdb.cc')
     Source('stacktrace.cc')
