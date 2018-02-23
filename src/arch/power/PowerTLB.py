@@ -46,5 +46,3 @@ class PowerTLB(SimObject):
     cxx_class = 'PowerISA::TLB'
     cxx_header = 'arch/power/tlb.hh'
     size = Param.Int(64, "TLB size")
-    rwalk = Param.PowerRadixWalk(\
-            PowerRadixWalk(), "radix walk")
