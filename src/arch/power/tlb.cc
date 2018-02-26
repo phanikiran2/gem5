@@ -318,6 +318,7 @@ Fault
 TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
 {
     Addr vaddr = req->getVaddr();
+    vaddr = vaddr & 0x3fffffffffffffff;
     DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
     Fault fault = NoFault;
     Addr paddr;
