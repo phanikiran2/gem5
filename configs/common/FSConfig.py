@@ -693,6 +693,7 @@ def makeLinuxPowerSystem(mem_mode, numCPUs=1, mdesc=None, cmdline=None):
     self.system_port = self.membus.slave
     self.intrctrl = IntrControl()
     self.mem_mode = mem_mode
+    self.terminal = Terminal()
     if not cmdline:
         cmdline = 'earlyprintk=ttyS0 console=ttyS0 lpj=7999923 root=/dev/hda1'
     self.boot_osflags = fillInCmdline(mdesc, cmdline)
