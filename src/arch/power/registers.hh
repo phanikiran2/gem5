@@ -133,7 +133,11 @@ enum MiscIntRegNums {
     INTREG_PVR,
     INTREG_PPR,
     INTREG_PPR32,
-    INTREG_MSR
+    INTREG_MSR,
+    INTREG_SPRG0,
+    INTREG_SPRG1,
+    INTREG_SPRG2,
+    INTREG_SPRG3
 };
 
 } // namespace PowerISA

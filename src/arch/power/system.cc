@@ -67,7 +67,7 @@ PowerSystem::initState()
 {
     System::initState();
     ThreadContext *tc = threadContexts[0];
-    tc->pcState(tc->getSystemPtr()->kernelEntry);
+    tc->pcState(0xc000000000000100);
     Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
     msr.ir = 0;
     msr.dr = 0;

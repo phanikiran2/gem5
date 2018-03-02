@@ -367,6 +367,10 @@ decode PO default Unknown::unknown() {
                 0x01C: mfppr({{ Rt = PPR; }});
                 0x05C: mfppr2({{ Rt =PPR32; }});
                 0x20E: mfptcr({{ Rt = PTCR; }});
+                0x208: mfsprg0({{Rt = SPRG0;}});
+                0x228: mfsprg1({{Rt = SPRG1;}});
+                0x248: mfsprg2({{Rt = SPRG2;}});
+                0x268: mfsprg3({{Rt = SPRG3;}});
             }
             467: decode SPR {
                 0x20: mtxer({{ XER = Rs; }});
@@ -387,6 +391,10 @@ decode PO default Unknown::unknown() {
                 0x01C: mtppr({{ PPR = Rs; }});
                 0x05C: mtppr32({{ PPR32 = Rs; }});
                 0x20E: mtptcr({{ PTCR = Rs; }});
+                0x208: mtsprg0({{SPRG0 = Rs;}});
+                0x228: mtsprg1({{SPRG1 = Rs;}});
+                0x248: mtsprg2({{SPRG2 = Rs;}});
+                0x268: mtsprg3({{SPRG3 = Rs;}});
             }
             83: mfmsr({{ Rt = MSR }});
             178: mtmsrd({{
