@@ -41,6 +41,10 @@ from System import System
 class PowerSystem(System):
     type = 'PowerSystem'
     cxx_header = 'arch/power/system.hh'
+    dtb_filename = Param.String("",
+        "File that contains the Device Tree Blob. Don't use DTB if empty.")
+    early_kernel_symbols = Param.Bool(False,
+        "enable early kernel symbol tables before MMU")
 
 class LinuxPowerSystem(PowerSystem):
     type = 'LinuxPowerSystem'

@@ -687,17 +687,19 @@ def makeLinuxPowerSystem(mem_mode, numCPUs=1, mdesc=None, cmdline=None):
     #self.iobus = IOXBar()
     self.membus = MemBus()
     #self.bridge = Bridge(delay='50ns')
+    self.mem_mode = mem_mode
     self.mem_ranges = [AddrRange('1GB')]
     #self.bridge.master = self.iobus.slave
     #self.bridge.slave = self.membus.master
     self.system_port = self.membus.slave
     self.intrctrl = IntrControl()
-    self.mem_mode = mem_mode
     self.terminal = Terminal()
+    #self.console = binary('console')
     if not cmdline:
         cmdline = 'earlyprintk=ttyS0 console=ttyS0 lpj=7999923 root=/dev/hda1'
     self.boot_osflags = fillInCmdline(mdesc, cmdline)
-    self.kernel = binary('start.elf')
+    self.kernel = binary('vmlinux')
+    self.dtb_filename = binary('virtex440-ml510.dtb')
     return self
 
 
