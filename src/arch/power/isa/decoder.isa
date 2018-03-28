@@ -646,6 +646,8 @@ decode PO default Unknown::unknown() {
             246: dcbtst({{ }});
             598: sync({{ }}, [ IsMemBarrier ]);
             854: eieio({{ }}, [ IsMemBarrier ]);
+            54:  dcbst({{ }});
+            982: icbi({{ }});
         }
 
         // These instructions are of XO form with bit 21 as the OE bit.

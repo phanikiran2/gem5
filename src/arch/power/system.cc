@@ -73,4 +73,7 @@ PowerSystem::initState()
     msr.dr = 0;
     tc->setIntReg(INTREG_MSR , msr);
     tc->setIntReg(INTREG_DEC , 0xffffffffffffffff );
+    //ArgumentReg0 is initialized with 0xc00000 because in linux/system.cc
+    //dtb is loaded at 0xc00000
+    tc->setIntReg(ArgumentReg0, 0xc00000);
 }

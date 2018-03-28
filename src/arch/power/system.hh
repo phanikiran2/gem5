@@ -51,6 +51,11 @@ class PowerSystem : public System
   public:
     void initState();
     typedef PowerSystemParams Params;
+    const Params *
+    params() const
+    {
+        return dynamic_cast<const Params *>(_params);
+    }
     PowerSystem(Params *p);
     ~PowerSystem();
 };
