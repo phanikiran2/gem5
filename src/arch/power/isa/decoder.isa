@@ -395,6 +395,7 @@ decode PO default Unknown::unknown() {
                 0x228: mtsprg1({{SPRG1 = Rs;}});
                 0x248: mtsprg2({{SPRG2 = Rs;}});
                 0x268: mtsprg3({{SPRG3 = Rs;}});
+                0x320: mtsdr1({{SDR1 = Rs;}});
             }
             83: mfmsr({{ Rt = MSR }});
             178: mtmsrd({{

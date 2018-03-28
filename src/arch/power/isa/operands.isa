@@ -88,6 +88,7 @@ def operands {{
     'SPRG1': ('IntReg', 'ud', 'INTREG_SPRG1', 'IsInteger', 9),
     'SPRG2': ('IntReg', 'ud', 'INTREG_SPRG2', 'IsInteger', 9),
     'SPRG3': ('IntReg', 'ud', 'INTREG_SPRG3', 'IsInteger', 9),
+    'SDR1': ('IntReg', 'ud', 'INTREG_SDR1', 'IsInteger' , 9),
 
     # Setting as IntReg so things are stored as an integer, not double
     'FPSCR': ('IntReg', 'uw', 'INTREG_FPSCR', 'IsFloating', 9),

@@ -137,7 +137,8 @@ enum MiscIntRegNums {
     INTREG_SPRG0,
     INTREG_SPRG1,
     INTREG_SPRG2,
-    INTREG_SPRG3
+    INTREG_SPRG3,
+    INTREG_SDR1
 };
 
 } // namespace PowerISA
