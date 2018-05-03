@@ -1,15 +1,6 @@
 /*
- * Copyright (c) 2007 The Hewlett-Packard Development Company
+ * Copyright (c) 2008 The Regents of The University of Michigan
  * All rights reserved.
- *
- * The license below extends only to copyright in the software and shall
- * not be construed as granting a license to any other intellectual
- * property including but not limited to intellectual property relating
- * to a hardware implementation of the functionality of the software
- * licensed hereunder.  You may use the software subject to the license
- * terms below provided that you ensure that this notice is replicated
- * unmodified and in its entirety in all distributions of the software,
- * modified or unmodified, in source code or in binary form.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -37,41 +28,47 @@
  * Authors: Gabe Black
  */
 
-#include "arch/power/system.hh"
+/** @file
+ * Implementation of PC platform.
+ */
+#include "dev/power/bamboo.hh"
 
-#include "arch/power/isa_traits.hh"
-#include "arch/power/miscregs.hh"
-#include "arch/power/registers.hh"
-#include "base/loader/object_file.hh"
-#include "cpu/thread_context.hh"
-#include "params/PowerSystem.hh"
+#include <deque>
+#include <string>
+#include <vector>
 
-using namespace PowerISA;
-PowerSystem::PowerSystem(Params *p) :
-    System(p)
+#include "config/the_isa.hh"
+#include "cpu/intr_control.hh"
+#include "dev/terminal.hh"
+#include "sim/system.hh"
+
+using namespace std;
+using namespace TheISA;
+
+Bamboo::Bamboo(const Params *p)
+    : Platform(p), system(p->system)
 {
-}
-
-PowerSystem::~PowerSystem()
-{
-}
-
-PowerSystem *
-PowerSystemParams::create()
-{
-    return new PowerSystem(this);
 }
 
 void
-PowerSystem::initState()
+Bamboo::init()
 {
-    System::initState();
-    ThreadContext *tc = threadContexts[0];
-    tc->pcState(0xc000000000000000);
-    tc->setIntReg(INTREG_MSR , 0x9000000000000001);
-    tc->setIntReg(INTREG_DEC , 0xffffffffffffffff );
-    tc->setIntReg(INTREG_PVR , 0x004e0100);
-    //ArgumentReg0 is initialized with 0xc00000 because in linux/system.cc
-    //dtb is loaded at 0xc00000
-    tc->setIntReg(ArgumentReg0, 0x800000);
+}
+
+void
+Bamboo::postConsoleInt()
+{
+}
+
+void
+Bamboo::clearConsoleInt()
+{
+    warn_once("Don't know what interrupt to clear for console.\n");
+    //panic("Need implementation\n");
+}
+
+Bamboo *
+BambooParams::create()
+{
+    return new Bamboo(this);
 }

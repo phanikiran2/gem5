@@ -81,7 +81,7 @@ LinuxPowerSystem::initState()
         // Kernel supports flattened device tree and dtb file specified.
         // Using Device Tree Blob to describe system configuration.
         inform("Loading DTB file: %s at address %#x\n", params()->dtb_filename,
-                0xc00000 +loadAddrOffset);
+                0x800000 +loadAddrOffset);
 
         ObjectFile *dtb_file = createObjectFile(params()->dtb_filename, true);
         if (!dtb_file) {
@@ -102,7 +102,7 @@ LinuxPowerSystem::initState()
                  "to DTB file: %s\n", params()->dtb_filename);
         }
 
-        dtb_file->setTextBase(0xc00000 +loadAddrOffset);
+        dtb_file->setTextBase(0x800000 +loadAddrOffset);
         dtb_file->loadSections(physProxy);
         delete dtb_file;
     }

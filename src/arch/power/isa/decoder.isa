@@ -54,6 +54,7 @@ decode PO default Unknown::unknown() {
     format IntOp {
         17: sc({{ xc->syscall(R0, &fault); }},
                [ IsSyscall, IsNonSpeculative, IsSerializeAfter ]);
+        02: tdi({{ }});
     }
 
     18: decode AA {
@@ -134,7 +135,7 @@ decode PO default Unknown::unknown() {
             150: isync({{ }}, [ IsSerializeAfter ]);
             18:  rfid({{
                 uint32_t msr12=(bits(MSR,60)&bits(SRR1,12))
-                               |((bits(MSR,60)^0x01)&bits(MSR,s12));
+                               |((bits(MSR,60)^0x01)&bits(MSR,12));
                 MSR = insertBits(MSR,12,msr12);
                 uint32_t msr60=bits(MSR,60)&bits(SRR1,60);
                 MSR = insertBits(MSR,60,msr60);
@@ -151,6 +152,20 @@ decode PO default Unknown::unknown() {
                 MSR = insertBits(MSR,11,6,bits(SRR1,11,6));
                 MSR = insertBits(MSR,3,0,bits(SRR1,3,0));
                 NIA = SRR0 & -4ULL;
+            }});
+            274:  hrfid({{
+                if((bits(MSR,34,32)!=0x02)|(bits(HSRR1,34,32)!=0x00))
+                    MSR = insertBits(MSR,34,32,bits(HSRR1,34,32));
+                MSR = insertBits(MSR,15,(bits(HSRR1,15)|bits(HSRR1,14)));
+                MSR = insertBits(MSR,5,(bits(HSRR1,5)|bits(HSRR1,14)));
+                MSR = insertBits(MSR,4,(bits(HSRR1,4)|bits(HSRR1,14)));
+                MSR = insertBits(MSR,63,35,bits(HSRR1,63,35));
+                MSR = insertBits(MSR,31,bits(HSRR1,35));
+                MSR = insertBits(MSR,26,22,bits(HSRR1,26,22));
+                MSR = insertBits(MSR,14,13,bits(HSRR1,14,13));
+                MSR = insertBits(MSR,11,6,bits(HSRR1,11,6));
+                MSR = insertBits(MSR,3,0,bits(HSRR1,3,0));
+                NIA = HSRR0 & -4ULL;
             }});
             default: decode DX_XO {
                 format IntDispArithOp {
@@ -361,7 +376,7 @@ decode PO default Unknown::unknown() {
                 0x360: mfsrr1({{ Rt = SRR1; }});
                 0x380: mfcfar({{ Rt = CFAR; }});
                 0x104: mfctrl({{ Rt = CTRL; }});
-                0x008:  mfvrsave({{ Rt = VRSAVE; }});
+                0x008: mfvrsave({{ Rt = VRSAVE; }});
                 0x1A8: mftbu({{ Rt = TBU; }});
                 0x3E8: mfpvr({{ Rt = PVR; }});
                 0x01C: mfppr({{ Rt = PPR; }});
@@ -371,6 +386,17 @@ decode PO default Unknown::unknown() {
                 0x228: mfsprg1({{Rt = SPRG1;}});
                 0x248: mfsprg2({{Rt = SPRG2;}});
                 0x268: mfsprg3({{Rt = SPRG3;}});
+                0x3c9: mflpcr({{Rt = LPCR;}});
+                0x324: mffscr({{Rt = FSCR;}});
+                0x2fa: mfpsscr({{Rt = PSSCR;}});
+                0x3e9: mflpidr({{Rt = LPIDR;}});
+                0x3c5: mfhfscr({{Rt = HFSCR;}});
+                0x21f: mfhir0({{Rt = HIR0;}});
+                0x3aa: mfamor({{Rt = AMOR;}});
+                0x3a1: mfiamr({{Rt = IAMR;}});
+                0x369: mfhssr1({{Rt = HSRR1;}});
+                0x349: mfhssr0({{Rt = HSRR0;}});
+
             }
             467: decode SPR {
                 0x20: mtxer({{ XER = Rs; }});
@@ -387,7 +413,6 @@ decode PO default Unknown::unknown() {
                 0x304: mtctrl({{ CTRL = Rs; }});
                 0x008: mtvrsave({{ VRSAVE = Rs; }});
                 0x1A8: mttbu({{ TBU = Rs; }});
-                0x3E8: mtpvr({{ PVR = Rs; }});
                 0x01C: mtppr({{ PPR = Rs; }});
                 0x05C: mtppr32({{ PPR32 = Rs; }});
                 0x20E: mtptcr({{ PTCR = Rs; }});
@@ -395,7 +420,23 @@ decode PO default Unknown::unknown() {
                 0x228: mtsprg1({{SPRG1 = Rs;}});
                 0x248: mtsprg2({{SPRG2 = Rs;}});
                 0x268: mtsprg3({{SPRG3 = Rs;}});
-                0x320: mtsdr1({{SDR1 = Rs;}});
+                0x3c9: mtlpcr({{LPCR = Rs;}});
+                0x324: mtfscr({{FSCR = Rs;}});
+                0x258: mtmmcra({{MMCRA = Rs;}});
+                0x378: mtmmcr0({{MMCR0 = Rs;}});
+                0x3d8: mtmmcr1({{MMCR1 = Rs;}});
+                0x238: mtmmcr2({{MMCR2 = Rs;}});
+                0x2fa: mtpsscr({{PSSCR = Rs;}});
+                0x3e9: mtlpidr({{LPIDR = Rs;}});
+                0x201: mtpidr({{PIDR = Rs;}});
+                0x3c5: mthfscr({{HFSCR = Rs;}});
+                0x27a: mtmmcrc({{MMCRC = Rs;}});
+                0x209: mthsprg0({{HSPRG0 = Rs;}});
+                0x21f: mthir0({{HIR0 = Rs;}});
+                0x3aa: mtamor({{AMOR = Rs;}});
+                0x3a1: mtiamr({{IAMR = Rs;}});
+                0x369: mthssr1({{HSRR1 = Rs;}});
+                0x349: mthssr0({{HSRR0 = Rs;}});
             }
             83: mfmsr({{ Rt = MSR }});
             178: mtmsrd({{
@@ -649,6 +690,10 @@ decode PO default Unknown::unknown() {
             854: eieio({{ }}, [ IsMemBarrier ]);
             54:  dcbst({{ }});
             982: icbi({{ }});
+            306: tlbie({{ }});
+            274: tlbiel({{ }});
+            566: tlbsync({{ }});
+            498: slbia({{ }});
         }
 
         // These instructions are of XO form with bit 21 as the OE bit.

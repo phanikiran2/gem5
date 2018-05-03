@@ -55,6 +55,7 @@ class LinuxPowerSystem : public PowerSystem
     typedef LinuxPowerSystemParams Params;
     LinuxPowerSystem(Params *p);
     ~LinuxPowerSystem();
+    void initState();
 };
 
 #endif

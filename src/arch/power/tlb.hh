@@ -96,6 +96,8 @@ struct TlbEntry
     }
 };
 
+class RadixWalk;
+
 class TLB : public BaseTLB
 {
   protected:
@@ -129,6 +131,8 @@ class TLB : public BaseTLB
     Stats::Formula accesses;
 
   public:
+    friend class RadixWalk;
+    RadixWalk *rwalk;
     typedef PowerTLBParams Params;
     TLB(const Params *p);
     virtual ~TLB();

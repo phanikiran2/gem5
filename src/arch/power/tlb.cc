@@ -34,7 +34,6 @@
  *          Stephen Hines
  *          Timothy M. Jones
  */
-
 #include "arch/power/tlb.hh"
 
 #include <string>
@@ -318,12 +317,13 @@ Fault
 TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
 {
     Addr vaddr = req->getVaddr();
-    vaddr = vaddr & 0x3fffffffffffffff;
     DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
     Fault fault = NoFault;
     Addr paddr;
+    vaddr &= 0x3fffffffffffffff;
     if (FullSystem){
-        Msr msr = tc->readMiscRegNoEffect(MISCREG_MSR);
+        Msr msr = tc->readIntReg(INTREG_MSR);
+        //std::cout<<msr<<std::endl;
         if (mode == Execute){
             if (msr.ir){
                 Fault fault = rwalk->start(tc,req, mode);
@@ -351,7 +351,6 @@ TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
     if (mode == Execute)
         return translateInst(req, tc);
     else{
-        //std::cout<<"translateData"<<std::endl;
         return translateData(req, tc, mode == Write);
      }
 }

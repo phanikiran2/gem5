@@ -1,15 +1,6 @@
 /*
- * Copyright (c) 2007 The Hewlett-Packard Development Company
+ * Copyright (c) 2008 The Regents of The University of Michigan
  * All rights reserved.
- *
- * The license below extends only to copyright in the software and shall
- * not be construed as granting a license to any other intellectual
- * property including but not limited to intellectual property relating
- * to a hardware implementation of the functionality of the software
- * licensed hereunder.  You may use the software subject to the license
- * terms below provided that you ensure that this notice is replicated
- * unmodified and in its entirety in all distributions of the software,
- * modified or unmodified, in source code or in binary form.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -37,41 +28,37 @@
  * Authors: Gabe Black
  */
 
-#include "arch/power/system.hh"
+/**
+ * @file
+ * Declaration of top level class for PC platform components. This class
+ * just retains pointers to all its children so the children can communicate.
+ */
 
-#include "arch/power/isa_traits.hh"
-#include "arch/power/miscregs.hh"
-#include "arch/power/registers.hh"
-#include "base/loader/object_file.hh"
-#include "cpu/thread_context.hh"
-#include "params/PowerSystem.hh"
+#ifndef __DEV_BAMBOO_HH__
+#define __DEV_BAMBOO_HH__
 
-using namespace PowerISA;
-PowerSystem::PowerSystem(Params *p) :
-    System(p)
+#include "dev/platform.hh"
+#include "params/Bamboo.hh"
+
+class System;
+
+class Bamboo : public Platform
 {
-}
+  public:
+    /** Pointer to the system */
+    System *system;
 
-PowerSystem::~PowerSystem()
-{
-}
+  public:
+    typedef BambooParams Params;
 
-PowerSystem *
-PowerSystemParams::create()
-{
-    return new PowerSystem(this);
-}
+    /**
+     * Do platform initialization stuff
+     */
+    void init() override;
+    void postConsoleInt() override;
+    void clearConsoleInt() override;
 
-void
-PowerSystem::initState()
-{
-    System::initState();
-    ThreadContext *tc = threadContexts[0];
-    tc->pcState(0xc000000000000000);
-    tc->setIntReg(INTREG_MSR , 0x9000000000000001);
-    tc->setIntReg(INTREG_DEC , 0xffffffffffffffff );
-    tc->setIntReg(INTREG_PVR , 0x004e0100);
-    //ArgumentReg0 is initialized with 0xc00000 because in linux/system.cc
-    //dtb is loaded at 0xc00000
-    tc->setIntReg(ArgumentReg0, 0x800000);
-}
+    Bamboo(const Params *p);
+};
+
+#endif // __DEV_BAMBOO_HH__

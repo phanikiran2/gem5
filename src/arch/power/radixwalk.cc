@@ -28,7 +28,7 @@ RadixWalk::start(ThreadContext * tc, RequestPtr req, BaseTLB::Mode mode)
 uint64_t
 RadixWalk::getRPDEntry(ThreadContext * tc)
 {
-    Ptcr ptcr = tc->readMiscRegNoEffect(MISCREG_PTCR);
+    Ptcr ptcr = tc->readIntReg(INTREG_PTCR);
     uint64_t baseaddr = ptcr.patb;
     uint64_t dataSize = 8;
     Request::Flags flags = Request::PHYSICAL;
