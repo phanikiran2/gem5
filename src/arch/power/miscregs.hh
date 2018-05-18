@@ -40,6 +40,8 @@ enum MiscRegIndex {
     MISCREG_CR,
     MISCREG_XER,
     MISCREG_FPSR,
+    MISCREG_MSR,
+    MISCREG_PTCR,
     NUM_MISCREGS
 };
 

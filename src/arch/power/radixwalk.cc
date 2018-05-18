@@ -29,22 +29,25 @@ uint64_t
 RadixWalk::getRPDEntry(ThreadContext * tc)
 {
     Ptcr ptcr = tc->readIntReg(INTREG_PTCR);
-    uint64_t baseaddr = ptcr.patb;
+    uint32_t lpidr = tc->readIntReg(INTREG_LPIDR);
+    uint64_t baseaddr = ptcr.patb+(lpidr*sizeof(uint64_t)*2)+8;
     uint64_t dataSize = 8;
     Request::Flags flags = Request::PHYSICAL;
     RequestPtr request = new Request(baseaddr, dataSize, flags,
                                      this->masterId);
     Packet *read = new Packet(request, MemCmd::ReadReq);
     read->allocate();
-    delete read->req;
-    uint64_t pate = read->get<uint64_t>();
-    if (pate>>63 == 1)
-    {
-           return pate;
-    }
-    else{
-        panic("HPT Walk Not implemented");
-    }
+    uint64_t pate1 = read->get<uint64_t>();
+    printf("2nd Quad word of partition table entry: %lx\n",pate1);
+    uint64_t prtb = (pate1 & 0x0fffffffffffff000)>>12;
+    prtb = prtb + (tc->readIntReg(INTREG_PIDR))*sizeof(prtb)*2 ;
+    request = new Request(prtb, dataSize, flags,
+                                     this->masterId);
+    read = new Packet(request, MemCmd::ReadReq);
+    read->allocate();
+    uint64_t prtbe = read->get<uint64_t>();
+    printf("process table entry: %lx\n\n",prtbe);
+    return prtbe;
 }
 
 Addr
