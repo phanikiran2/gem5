@@ -58,7 +58,7 @@ def system():
             path = env['M5_PATH'].split(':')
         except KeyError:
             path = [ '/dist/m5/system',
-                   '/home/student/Desktop/full_system_images/x86-system' ]
+                   '/path/to/kernel/and/dts' ]
 
         # expand '~' and '~user' in paths
         path = map(os.path.expanduser, path)
