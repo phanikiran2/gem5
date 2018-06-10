@@ -330,15 +330,115 @@ decode PO default Unknown::unknown() {
                 0x20: mfxer({{ Rt = XER; }});
                 0x100: mflr({{ Rt = LR; }});
                 0x120: mfctr({{ Rt = CTR; }});
-                // This is the PVR corresponding to POWER8.
-		0x188: mftb({{ Rt = 0; }});
-                0x3E8: mfpvr({{ Rt = 0x004a0201; }});
+                0x188: mftb({{ Rt = TB; }});
+                0x220: mfdscr({{ Rt = DSCR; }});
+                0x240: mfdsisr({{ Rt = DSISR; }});
+                0x260: mfdar({{ Rt = DAR; }});
+                0x2C0: mfdec({{ Rt = DEC; }});
+                0x340: mfsrr0({{ Rt = SRR0; }});
+                0x360: mfsrr1({{ Rt = SRR1; }});
+                0x380: mfcfar({{ Rt = CFAR; }});
+                0x104: mfctrl({{ Rt = CTRL; }});
+                0x008: mfvrsave({{ Rt = VRSAVE; }});
+                0x1A8: mftbu({{ Rt = TBU; }});
+                0x3E8: mfpvr({{ Rt = PVR; }});
+                0x01C: mfppr({{ Rt = PPR; }});
+                0x05C: mfppr2({{ Rt =PPR32; }});
+                0x20E: mfptcr({{ Rt = PTCR; }});
+                0x208: mfsprg0({{Rt = SPRG0;}});
+                0x228: mfsprg1({{Rt = SPRG1;}});
+                0x248: mfsprg2({{Rt = SPRG2;}});
+                0x268: mfsprg3({{Rt = SPRG3;}});
+                0x3c9: mflpcr({{Rt = LPCR;}});
+                0x324: mffscr({{Rt = FSCR;}});
+                0x2fa: mfpsscr({{Rt = PSSCR;}});
+                0x3e9: mflpidr({{Rt = LPIDR;}});
+                0x3c5: mfhfscr({{Rt = HFSCR;}});
+                0x21f: mfhir0({{Rt = HIR0;}});
+                0x3aa: mfamor({{Rt = AMOR;}});
+                0x3a1: mfiamr({{Rt = IAMR;}});
+                0x369: mfhssr1({{Rt = HSRR1;}});
+                0x349: mfhssr0({{Rt = HSRR0;}});
+                0x2c9: mfhdec({{Rt = HDEC;}});
+                0x24a: mfpcr({{Rt = PCR;}});
             }
             467: decode SPR {
                 0x20: mtxer({{ XER = Rs; }});
                 0x100: mtlr({{ LR = Rs; }});
                 0x120: mtctr({{ CTR = Rs; }});
+                0x390: mttbl({{ TBL = Rs; }});
+                0x220: mtdscr({{ DSCR = Rs; }});
+                0x240: mtdsisr({{ DSISR = Rs; }});
+                0x260: mtdar({{ DAR = Rs; }});
+                0x2C0: mtdec({{ DEC = Rs; }});
+                0x340: mtsrr0({{ SRR0 = Rs; }});
+                0x360: mtsrr1({{ SRR1 = Rs; }});
+                0x380: mtcfar({{ CFAR = Rs; }});
+                0x304: mtctrl({{ CTRL = Rs; }});
+                0x008: mtvrsave({{ VRSAVE = Rs; }});
+                0x1A8: mttbu({{ TBU = Rs; }});
+                0x01C: mtppr({{ PPR = Rs; }});
+                0x05C: mtppr32({{ PPR32 = Rs; }});
+                0x20E: mtptcr({{ PTCR = Rs; }});
+                0x208: mtsprg0({{SPRG0 = Rs;}});
+                0x228: mtsprg1({{SPRG1 = Rs;}});
+                0x248: mtsprg2({{SPRG2 = Rs;}});
+                0x268: mtsprg3({{SPRG3 = Rs;}});
+                0x3c9: mtlpcr({{LPCR = Rs;}});
+                0x324: mtfscr({{FSCR = Rs;}});
+                0x258: mtmmcra({{MMCRA = Rs;}});
+                0x378: mtmmcr0({{MMCR0 = Rs;}});
+                0x3d8: mtmmcr1({{MMCR1 = Rs;}});
+                0x238: mtmmcr2({{MMCR2 = Rs;}});
+                0x2fa: mtpsscr({{PSSCR = Rs;}});
+                0x3e9: mtlpidr({{LPIDR = Rs;}});
+                0x201: mtpidr({{PIDR = Rs;}});
+                0x3c5: mthfscr({{HFSCR = Rs;}});
+                0x27a: mtmmcrc({{MMCRC = Rs;}});
+                0x209: mthsprg0({{HSPRG0 = Rs;}});
+                0x21f: mthir0({{HIR0 = Rs;}});
+                0x3aa: mtamor({{AMOR = Rs;}});
+                0x3a1: mtiamr({{IAMR = Rs;}});
+                0x369: mthssr1({{HSRR1 = Rs;}});
+                0x349: mthssr0({{HSRR0 = Rs;}});
+                0x2c9: mthdec({{HDEC = Rs;}});
+                0x24a: mtpcr({{PCR = Rs;}});
             }
+            83: mfmsr({{ Rt = MSR }});
+            178: mtmsrd({{
+                 if (L == 0 ){
+                     if(bits(MSR,34,32)!=0x02||bits(MSR,34,32)!=0x00){
+                         insertBits(MSR,15,bits(Rs,15)|bits(Rs,14));
+                         insertBits(MSR,5,bits(Rs,5)|bits(Rs,14));
+                         insertBits(MSR,4,bits(Rs,4)|bits(Rs,14));
+                         insertBits(MSR,63,61,bits(Rs,63,61));
+                         insertBits(MSR,59,35,bits(Rs,59,35));
+                         insertBits(MSR,31,16,bits(Rs,31,16));
+                         insertBits(MSR,14,13,bits(Rs,14,13));
+                         insertBits(MSR,11,6,bits(Rs,11,6));
+                         insertBits(MSR,3,1,bits(Rs,3,1));
+                     }
+                 }
+                 else{
+                     insertBits(MSR,15,bits(Rs,15));
+                     insertBits(MSR,1,bits(Rs,1));
+                 }
+            }});
+            146: mtmsr({{
+                 if( L ==0 ){
+                     insertBits(MSR,15,bits(Rs,15)|bits(Rs,14));
+                     insertBits(MSR,5,bits(Rs,5)|bits(Rs,14));
+                     insertBits(MSR,4,bits(Rs,4)|bits(Rs,14));
+                     insertBits(MSR,31,16,bits(Rs,31,16));
+                     insertBits(MSR,14,13,bits(Rs,14,13));
+                     insertBits(MSR,11,6,bits(Rs,11,6));
+                     insertBits(MSR,3,1,bits(Rs,3,1));
+                 }
+                 else{
+                     insertBits(MSR,15,bits(Rs,15));
+                     insertBits(MSR,1,bits(Rs,1));
+                 }
+            }});
         }
 
         // Integer logic instructions use source registers Rs and Rb,
