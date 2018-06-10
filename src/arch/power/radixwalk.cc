@@ -7,6 +7,7 @@
 #include "base/bitfield.hh"
 #include "cpu/base.hh"
 #include "cpu/thread_context.hh"
+#include "debug/RadixWalk.hh"
 #include "mem/packet_access.hh"
 #include "mem/request.hh"
 
@@ -49,7 +50,7 @@ RadixWalk::getRPDEntry(ThreadContext * tc)
     this->port.sendAtomic(read);
     uint64_t pate1 = read->get<uint64_t>();
     DPRINTF(RadixWalk,"2nd Double word of partition table entry: %lx\n",pate1);
-    uint64_t prtb = (pate1 & 0x0ffffffffffff000) >> 12;
+    uint64_t prtb = (pate1 & 0x0ffffffffffff000);
     delete read->req;
     prtb = prtb + (tc->readIntReg(INTREG_PIDR))*sizeof(prtb)*2 ;
     DPRINTF(RadixWalk,"Process table base: %lx\n",prtb);

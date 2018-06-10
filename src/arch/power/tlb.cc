@@ -324,18 +324,22 @@ TLB::translateData(RequestPtr req, ThreadContext *tc, bool write)
 Fault
 TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
 {
+    Addr paddr;
+    Addr vaddr = req->getVaddr();
+    DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
+    vaddr &= 0x0fffffffffffffff;
     if (FullSystem){
-       Msr msr = tc->readIntReg(MISCREG_MSR);
+       Msr msr = tc->readIntReg(INTREG_MSR);
         if (mode == Execute){
             if (msr.ir){
                 printf("MSR: %lx\n",(uint64_t)msr);
                 Fault fault = rwalk->start(tc,req, mode);
                 paddr = req->getPaddr();
+                return fault;
             }
             else{
-                Addr vaddr = req->getVaddr();
                 DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
-                Addr paddr = vaddr;
+                paddr = vaddr;
                 DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
                 req->setPaddr(paddr);
                 return NoFault;
@@ -345,11 +349,11 @@ TLB::translateAtomic(RequestPtr req, ThreadContext *tc, Mode mode)
             if (msr.dr){
                 Fault fault = rwalk->start(tc,req, mode);
                 paddr = req->getPaddr();
+                return fault;
             }
             else{
-                Addr vaddr = req->getVaddr();
                 DPRINTF(TLB, "Translating vaddr %#x.\n", vaddr);
-                Addr paddr = vaddr;
+                paddr = vaddr;
                 DPRINTF(TLB, "Translated %#x -> %#x.\n", vaddr, paddr);
                 req->setPaddr(paddr);
                 return NoFault;

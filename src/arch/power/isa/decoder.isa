@@ -54,6 +54,7 @@ decode PO default Unknown::unknown() {
     format IntOp {
         17: sc({{ xc->syscall(R0, &fault); }},
                [ IsSyscall, IsNonSpeculative, IsSerializeAfter ]);
+        02: tdi({{ }});
     }
 
     18: decode AA {
@@ -686,6 +687,12 @@ decode PO default Unknown::unknown() {
             246: dcbtst({{ }});
             598: sync({{ }}, [ IsMemBarrier ]);
             854: eieio({{ }}, [ IsMemBarrier ]);
+            54:  dcbst({{ }});
+            982: icbi({{ }});
+            306: tlbie({{ }});
+            274: tlbiel({{ }});
+            566: tlbsync({{ }});
+            498: slbia({{ }});
         }
 
         // These instructions are of XO form with bit 21 as the OE bit.
