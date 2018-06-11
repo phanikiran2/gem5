@@ -40,6 +40,7 @@ RadixWalk::getRPDEntry(ThreadContext * tc)
     uint32_t lpidr = tc->readIntReg(INTREG_LPIDR);
     DPRINTF(RadixWalk,"LPIDR: %x\n",lpidr);
     //Accessing 2nd double wod of partition table (pate1)
+    //Ref: Power ISA Mnaual v3.0B, Book-III, section 5.7.6.1
     uint64_t baseaddr = (ptcr.patb << 12)+(lpidr*sizeof(uint64_t)*2)+8;
     uint64_t dataSize = 8;
     Request::Flags flags = Request::PHYSICAL;
@@ -52,6 +53,7 @@ RadixWalk::getRPDEntry(ThreadContext * tc)
     DPRINTF(RadixWalk,"2nd Double word of partition table entry: %lx\n",pate1);
     uint64_t prtb = (pate1 & 0x0ffffffffffff000);
     delete read->req;
+    //Ref: Power ISA Mnaual v3.0B, Book-III, section 5.7.6.2
     prtb = prtb + (tc->readIntReg(INTREG_PIDR))*sizeof(prtb)*2 ;
     DPRINTF(RadixWalk,"Process table base: %lx\n",prtb);
     flags = Request::PHYSICAL;
@@ -84,13 +86,14 @@ RadixWalk::walkTree(Addr vaddr ,uint64_t ptbase ,
         this->port.sendAtomic(read);
         Rpde rpde = read->get<uint64_t>();
         delete read->req;
-        printf("rpde:%lx\n",(uint64_t)rpde);
+        DPRINTF(RadixWalk,"rpde:%lx\n",(uint64_t)rpde);
+        //Ref: Power ISA Mnaual v3.0B, Book-III, section 5.7.10.2
         if (rpde.leaf == 1)
         {
                 uint64_t realpn = rpde & 0x01fffffffffff000;
                 uint64_t pageMask = (1UL << pagesize) - 1;
                 Addr paddr = (realpn & ~pageMask) | (vaddr & pageMask);
-                printf("paddr:%lx\n",paddr);
+                DPRINTF(RadixWalk,"paddr:%lx\n",paddr);
                 return paddr;
         }
         DPRINTF(RadixWalk,"NLB: %lx\n",(uint64_t)rpde.nextLevelBase);
